@@ -11,6 +11,7 @@ fiona = "^1.9.4.post1"
 pydantic = "^2.3.0"
 pyogrio = "^0.6.0"
 geopandas = "^0.13.2"
+requests = "^2.31.0"
 
 
 [tool.poetry.group.dev.dependencies]

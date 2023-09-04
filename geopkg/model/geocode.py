@@ -11,10 +11,16 @@ class GeoCode(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     year: int
-    geometry: Geometry
+    geometry: Any
+    objectid: int
     code: str 
     name: str
     name_welsh: str
+    bng_e: int
+    bng_n: int
     long: float
     lat: float
+    shape__area: float
+    shape__length: float
+    globalid: str
     tile: Optional[str] = None

@@ -2,9 +2,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Union
 
-import geopandas as gpd
+import geopandas as gpd  # type: ignore
 import pandas as pd
-from geopandas import GeoDataFrame
 
 from geopkg.validators import validate_geocode_gdf
 
@@ -36,14 +35,13 @@ class GeoTiler:
     of all tiles the geocode intersects with
     """
 
-    geocode_gdf: GeoDataFrame
+    geocode_gdf: gpd.GeoDataFrame
     year: int
     code_field: str
     name_field: str
     welsh_name_field: str = ""
 
     def __post_init__(self) -> None:
-
         validate_geocode_gdf(
             self.geocode_gdf, self.code_field, self.name_field, self.welsh_name_field
         )
@@ -61,13 +59,12 @@ class GeoTiler:
         return list(set(self.geocode_gdf["code"]))
 
     def map_code_to_tile(self) -> dict[str, Union[str, list[str]]]:
-
-        tiles = gpd.read_file("tiles.gpkg")
+        tiles: gpd.GeoDataFrame = gpd.read_file("tiles.gpkg")  # type: ignore
         tiles["zoom"] = tiles["tile"].str.split("-", expand=True)[2]
         zooms: list[int] = list(set(tiles["zoom"]))
 
-        intersect: pd.DataFrame = (
-            self.geocode_gdf.sjoin(tiles, predicate="intersects")
+        intersect = pd.DataFrame(
+            self.geocode_gdf.sjoin(tiles, predicate="intersects")  # type: ignore
             .groupby(["code", "name", "welsh_name", "tile", "zoom"])
             .size()
             .reset_index(name="count")[["code", "name", "welsh_name", "tile", "zoom"]]
@@ -75,7 +72,6 @@ class GeoTiler:
 
         ret_map: dict[str, Union[str, list[str]]] = {}
         for code in self.geocodes:
-
             code_data = intersect.loc[intersect["code"] == code]
 
             tile_data: dict[int, list[str]] = {}

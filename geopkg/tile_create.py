@@ -1,6 +1,5 @@
 import math
 from dataclasses import dataclass
-from typing import Tuple
 
 import numpy as np
 from geopandas import GeoDataFrame
@@ -35,7 +34,7 @@ def tile_bbox(zoom: int, x: int, y: int) -> BoundingBox:
     )
 
 
-def tile_to_geojson(tile: str) -> Tuple[str, Polygon]:
+def tile_to_geojson(tile: str) -> tuple[str, Polygon]:
     z, x, y = tile.split("/")
     bbox = tile_bbox(zoom=int(z), x=int(x), y=int(y))
     box_geom = box(bbox.west, bbox.south, bbox.east, bbox.north)
@@ -43,7 +42,6 @@ def tile_to_geojson(tile: str) -> Tuple[str, Polygon]:
 
 
 def main() -> None:
-
     tile_list = list(np.load("list_of_tiles.npy"))
 
     tiles = []

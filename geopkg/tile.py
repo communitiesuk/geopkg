@@ -21,6 +21,10 @@ class Tile:
     coordinate: Coordinate
 
     @property
+    def id(self) -> str:
+        return "-".join(map(str, self.coordinate.vector))
+
+    @property
     def bbox(self) -> BoundingBox:
         x, y, z = self.coordinate.vector
 
@@ -37,4 +41,4 @@ class Tile:
         return Polygon(coords, holes=None)
 
     def __repr__(self) -> str:
-        return "-".join(map(str, self.coordinate.vector))
+        return self.id

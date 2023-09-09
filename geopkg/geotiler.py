@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Union
 
 import geopandas as gpd  # type: ignore
@@ -92,8 +91,3 @@ class GeoTiler:
             }
 
         return ret_map
-
-
-gdf = gpd.read_file(Path("geopkg/Local_Authority_Districts_2023_May.gpkg"))
-output = GeoTiler(gdf, 2023, "LAD23CD", "LAD23NM", "LAD23NMW").map_code_to_tile()
-print(output)

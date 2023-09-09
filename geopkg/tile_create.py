@@ -1,8 +1,6 @@
 import math
 from dataclasses import dataclass
 
-import numpy as np
-from geopandas import GeoDataFrame
 from shapely import Polygon
 from shapely.geometry import box
 
@@ -39,24 +37,3 @@ def tile_to_geojson(tile: str) -> tuple[str, Polygon]:
     bbox = tile_bbox(zoom=int(z), x=int(x), y=int(y))
     box_geom = box(bbox.west, bbox.south, bbox.east, bbox.north)
     return f"{y}-{x}-{z}", box_geom
-
-
-def main() -> None:
-    tile_list = list(np.load("list_of_tiles.npy"))
-
-    tiles = []
-    geometries = []
-    for tile in tile_list:
-        if int(tile.split("/")[0]) < 14:
-            tile, geometry = tile_to_geojson(tile)
-            tiles.append(tile)
-            geometries.append(geometry)
-        else:
-            continue
-
-    gdf = GeoDataFrame(tiles, columns=["tile"], geometry=geometries, crs=4326)
-    gdf.to_file("tiles.gpkg", driver="GPKG")
-
-
-if __name__ == "__main__":
-    main()

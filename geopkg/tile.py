@@ -1,7 +1,7 @@
 import math
 from dataclasses import asdict, dataclass
 
-from shapely import Polygon  # type: ignore
+from shapely import Polygon
 
 from geopkg.types import BoundingBox, Coordinate
 
@@ -34,7 +34,7 @@ class Tile:
     def to_geojson(self) -> "Polygon":
         minx, miny, maxx, maxy = asdict(self.bbox).values()
         coords = [(maxx, miny), (maxx, maxy), (minx, maxy), (minx, miny)]
-        return Polygon(coords)  # type: ignore
+        return Polygon(coords, holes=None)
 
     def __repr__(self) -> str:
         return "-".join(map(str, self.coordinate.vector))

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import NamedTuple
 
+Vector = tuple[int, int, int]
+
 
 class Coordinate(NamedTuple):
     x: int
@@ -8,7 +10,7 @@ class Coordinate(NamedTuple):
     z: int
 
     @property
-    def vector(self) -> tuple[int, int, int]:
+    def vector(self) -> Vector:
         return self.x, self.y, self.z
 
 

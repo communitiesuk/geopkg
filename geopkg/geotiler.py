@@ -58,7 +58,7 @@ class GeoTiler:
         return list(set(self.geocode_gdf["code"]))
 
     def map_code_to_tile(self) -> dict[str, Union[str, list[str]]]:
-        tiles: gpd.GeoDataFrame = gpd.read_file("tiles.gpkg")  # type: ignore
+        tiles: gpd.GeoDataFrame = gpd.read_file("data/tiles.gpkg")  # type: ignore
         tiles["zoom"] = tiles["tile"].str.split("-", expand=True)[2]
         zooms: list[int] = list(set(tiles["zoom"]))
 

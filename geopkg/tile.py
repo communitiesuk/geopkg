@@ -35,7 +35,7 @@ class Tile:
             east=calculate_longitude(Coordinate(x + 1, y, z)),
         )
 
-    def to_geojson(self) -> "Polygon":
+    def to_geojson(self) -> Polygon:
         minx, miny, maxx, maxy = asdict(self.bbox).values()
         coords = [(maxx, miny), (maxx, maxy), (minx, maxy), (minx, miny)]
         return Polygon(coords, holes=None)

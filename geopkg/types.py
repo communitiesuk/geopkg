@@ -20,3 +20,7 @@ class BoundingBox:
     south: float
     east: float
     west: float
+
+    @property
+    def edges(self) -> tuple[float, float, float, float]:
+        return self.west, self.south, self.east, self.north

@@ -1,8 +1,11 @@
 import math
 from dataclasses import asdict, dataclass
+from typing import Any, Generator
 
+import mercantile
 from shapely import Polygon
 
+from geopkg.constants import DEFAULT_MAX_ZOOM, UK_BBOX
 from geopkg.types import BoundingBox, Coordinate
 
 
@@ -42,3 +45,10 @@ class Tile:
 
     def __repr__(self) -> str:
         return self.id
+
+
+def generate_tiles(max_z: int = DEFAULT_MAX_ZOOM) -> list[Tile]:
+    m_tiles: Generator[mercantile.Tile, Any, None] = mercantile.tiles(
+        *UK_BBOX.edges, zooms=[*range(max_z + 1)]
+    )
+    return [Tile(Coordinate(*t)) for t in [*m_tiles]]

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Optional, Union
 
 import geopandas as gpd  # type: ignore
 import pandas as pd
@@ -38,20 +38,21 @@ class GeoTiler:
     year: int
     code_field: str
     name_field: str
-    welsh_name_field: str = ""
+    welsh_name_field: Optional[str] = None
 
     def __post_init__(self) -> None:
         validate_geocode_gdf(
             self.geocode_gdf, self.code_field, self.name_field, self.welsh_name_field
         )
 
-        self.geocode_gdf = self.geocode_gdf.rename(
-            columns={
-                self.code_field: "code",
-                self.name_field: "name",
-                self.welsh_name_field: "welsh_name",
-            }
-        )
+        columns = {
+            self.code_field: "code",
+            self.name_field: "name",
+        }
+        if self.welsh_name_field is not None:
+            columns[self.welsh_name_field] = "welsh_name"
+
+        self.geocode_gdf = gpd.GeoDataFrame(self.geocode_gdf.rename(columns=columns))
 
     @property
     def geocodes(self) -> list[str]:

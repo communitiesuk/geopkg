@@ -1,5 +1,11 @@
 ### Project
 app/*
+data/*
+
+geo_module_overview.ipynb
+time_series_testing.ipynb
+geopkg/Local_Authority_Districts_2023_May.gpkg
+list_of_tiles.npy
 
 # Logs
 logs

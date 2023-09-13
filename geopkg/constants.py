@@ -19,3 +19,11 @@ UK_BBOX = BoundingBox(
     south=49.8333,
     west=-8.1667,
 )
+
+
+class GeoType(Enum):
+    REGION = "region"
+    LAD = "lad"
+    LSOA = "lsoa"
+    MSOA = "msoa"
+    OA = "oa"

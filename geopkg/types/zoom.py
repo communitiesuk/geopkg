@@ -8,6 +8,6 @@ MAX_ZOOM = 18
 
 class Zoom:
     def __getitem__(self, index: SupportedZoomLevels) -> int:
-        if not index in range(1, MAX_ZOOM + 1):
+        if index not in range(1, MAX_ZOOM + 1):
             raise IndexError(f"Zoom level {index} is not supported")
         return index

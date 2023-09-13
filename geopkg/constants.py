@@ -1,11 +1,14 @@
 from enum import Enum
 
-from geopkg.types import BoundingBox
+from geopkg.types import GeoType, Zoom
+from geopkg.types.model import BoundingBox
 
 GEOMETRY_COLUMN_NAME = "geometry"
 REQUIRED_COLUMNS: tuple[str, ...] = GEOMETRY_COLUMN_NAME, "code", "name", "welsh_name"
 
 DEFAULT_MAX_ZOOM = 14
+
+zoom = Zoom()
 
 
 class CoordinateReferenceSystem(Enum):
@@ -21,9 +24,10 @@ UK_BBOX = BoundingBox(
 )
 
 
-class GeoType(Enum):
-    REGION = "region"
-    LAD = "lad"
-    LSOA = "lsoa"
-    MSOA = "msoa"
-    OA = "oa"
+GEO_TYPE_ZOOM_MAP: dict[GeoType, int] = {
+    GeoType.REGION: zoom[1],
+    GeoType.LAD: zoom[5],
+    GeoType.MSOA: zoom[8],
+    GeoType.LSOA: zoom[10],
+    GeoType.OA: zoom[14],
+}

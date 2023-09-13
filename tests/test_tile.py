@@ -4,7 +4,7 @@ import pytest
 from shapely.geometry import Polygon
 
 from geopkg.tile import Tile, calculate_latitude, calculate_longitude
-from geopkg.types import Coordinate, Vector
+from geopkg.types.model import Coordinate, Vector
 
 
 @pytest.mark.parametrize(

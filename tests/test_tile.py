@@ -77,5 +77,5 @@ def test_tile_bbox(c: Coordinate, expected: tuple[float, float, float, float]) -
     ],
 )
 def test_tile_to_geojson(c: Coordinate, expected: int) -> None:
-    assert isinstance(Tile(c).to_geojson(), Polygon)
-    assert len(Tile(c).to_geojson().exterior.coords) == expected
+    assert isinstance(Tile(c).geometry(), Polygon)
+    assert len(Tile(c).geometry().exterior.coords) == expected

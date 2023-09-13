@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import NamedTuple
 
 Vector = tuple[int, int, int]
@@ -20,6 +20,9 @@ class BoundingBox:
     south: float
     east: float
     west: float
+
+    def as_dict(self) -> dict[str, float]:
+        return asdict(self)
 
     @property
     def edges(self) -> tuple[float, float, float, float]:

@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Optional, Union
 
 import geopandas as gpd  # type: ignore
 import pandas as pd
 
+from geopkg.tile import generate_tiles
 from geopkg.validators import validate_geocode_gdf
 
 
@@ -38,35 +39,48 @@ class GeoTiler:
     year: int
     code_field: str
     name_field: str
-    welsh_name_field: str = ""
+    welsh_name_field: Optional[str] = None
 
     def __post_init__(self) -> None:
         validate_geocode_gdf(
             self.geocode_gdf, self.code_field, self.name_field, self.welsh_name_field
         )
 
-        self.geocode_gdf = self.geocode_gdf.rename(
-            columns={
-                self.code_field: "code",
-                self.name_field: "name",
-                self.welsh_name_field: "welsh_name",
-            }
-        )
+        columns = {
+            self.code_field: "code",
+            self.name_field: "name",
+        }
+        if self.welsh_name_field is not None:
+            columns[self.welsh_name_field] = "welsh_name"
+
+        self.geocode_gdf = gpd.GeoDataFrame(self.geocode_gdf.rename(columns=columns))
 
     @property
     def geocodes(self) -> list[str]:
         return list(set(self.geocode_gdf["code"]))
 
     def map_code_to_tile(self) -> dict[str, Union[str, list[str]]]:
-        tiles: gpd.GeoDataFrame = gpd.read_file("data/tiles.gpkg")  # type: ignore
-        tiles["zoom"] = tiles["tile"].str.split("-", expand=True)[2]
-        zooms: list[int] = list(set(tiles["zoom"]))
+
+        tiles = generate_tiles(13)
+        tiles_gdf = gpd.GeoDataFrame(  # type: ignore
+            data=[tile.id for tile in tiles],
+            geometry=[tile.geometry() for tile in tiles],
+            columns=["tile_id"],
+            crs=4326,
+        )
+
+        tiles_gdf["zoom"] = tiles_gdf["tile_id"].str.split(  # type: ignore
+            "-", expand=True
+        )[2]
+        zooms: list[int] = list(set(tiles_gdf["zoom"]))  # type: ignore
 
         intersect = pd.DataFrame(
-            self.geocode_gdf.sjoin(tiles, predicate="intersects")  # type: ignore
-            .groupby(["code", "name", "welsh_name", "tile", "zoom"])
+            self.geocode_gdf.sjoin(tiles_gdf, predicate="intersects")  # type: ignore
+            .groupby(["code", "name", "welsh_name", "tile_id", "zoom"])
             .size()
-            .reset_index(name="count")[["code", "name", "welsh_name", "tile", "zoom"]]
+            .reset_index(name="count")[
+                ["code", "name", "welsh_name", "tile_id", "zoom"]
+            ]
         )
 
         ret_map: dict[str, Union[str, list[str]]] = {}
@@ -76,7 +90,7 @@ class GeoTiler:
             tile_data: dict[int, list[str]] = {}
             for zoom in zooms:
                 tile_data[zoom] = list(
-                    list(list(code_data.loc[code_data["zoom"] == zoom, "tile"]))
+                    code_data.loc[code_data["zoom"] == zoom, "tile_id"]
                 )
 
             ret_map[code] = {  # type: ignore
@@ -91,3 +105,22 @@ class GeoTiler:
             }
 
         return ret_map
+
+
+def create_tile_map(
+    geocode_gdf: gpd.GeoDataFrame,
+    year: int,
+    code_field: str,
+    name_field: str,
+    welsh_name_field: Optional[str] = None,
+) -> dict[str, Union[str, list[str]]]:
+
+    geotiler = GeoTiler(
+        geocode_gdf=geocode_gdf,
+        year=year,
+        code_field=code_field,
+        name_field=name_field,
+        welsh_name_field=welsh_name_field,
+    ).map_code_to_tile()
+
+    return geotiler

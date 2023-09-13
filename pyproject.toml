@@ -26,7 +26,6 @@ pre-commit = "^2.20.0"
 black = {version = "^22.6.0", allow-prereleases = true}
 flake8 = "^5.0.4"
 pylint = "2.13.0"
-pandas-stubs = "^1.5.3.230214"
 
 [build-system]
 requires = ["poetry-core"]

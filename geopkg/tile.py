@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 from dataclasses import asdict, dataclass
 from typing import Any, Generator
@@ -38,6 +40,20 @@ class Tile:
             east=calculate_longitude(Coordinate(x + 1, y, z)),
         )
 
+    @property
+    def parent(self) -> Tile:
+        mt = mercantile.Tile(*self.coordinate.vector)
+
+        if mt.z == 0:
+            return GLOBAL_TILE
+
+        return Tile(Coordinate(*mercantile.parent(mt)))
+
+    @property
+    def children(self) -> list[Tile]:
+        mt = mercantile.Tile(*self.coordinate.vector)
+        return [Tile(Coordinate(*c)) for c in mercantile.children(mt)]
+
     def geometry(self) -> Polygon:
         minx, miny, maxx, maxy = asdict(self.bbox).values()
         coords = [(maxx, miny), (maxx, maxy), (minx, maxy), (minx, miny)]
@@ -47,8 +63,11 @@ class Tile:
         return self.id
 
 
+GLOBAL_TILE = Tile(Coordinate(x=0, y=0, z=0))
+
+
 def generate_tiles(max_z: int = DEFAULT_MAX_ZOOM) -> list[Tile]:
     m_tiles: Generator[mercantile.Tile, Any, None] = mercantile.tiles(
         *UK_BBOX.edges, zooms=[*range(max_z + 1)]
     )
-    return [Tile(Coordinate(*t)) for t in [*m_tiles]]
+    return [Tile(Coordinate(*t)) for t in m_tiles]

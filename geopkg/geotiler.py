@@ -4,6 +4,7 @@ from typing import Optional, Union
 import geopandas as gpd  # type: ignore
 import pandas as pd
 
+from geopkg import UK_BBOX
 from geopkg.tile import generate_tiles
 from geopkg.validators import validate_geocode_gdf
 
@@ -60,8 +61,7 @@ class GeoTiler:
         return list(set(self.geocode_gdf["code"]))
 
     def map_code_to_tile(self) -> dict[str, Union[str, list[str]]]:
-
-        tiles = generate_tiles(13)
+        tiles = generate_tiles(UK_BBOX, 13)
         tiles_gdf = gpd.GeoDataFrame(  # type: ignore
             data=[tile.id for tile in tiles],
             geometry=[tile.geometry() for tile in tiles],
@@ -114,7 +114,6 @@ def create_tile_map(
     name_field: str,
     welsh_name_field: Optional[str] = None,
 ) -> dict[str, Union[str, list[str]]]:
-
     geotiler = GeoTiler(
         geocode_gdf=geocode_gdf,
         year=year,

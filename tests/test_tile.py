@@ -3,7 +3,8 @@ from dataclasses import asdict
 import pytest
 from shapely.geometry import Polygon
 
-from geopkg.tile import Tile, calculate_latitude, calculate_longitude
+from geopkg.tile.compute import calculate_latitude, calculate_longitude
+from geopkg.tile.core import Tile
 from geopkg.types.model import Coordinate, Vector
 
 

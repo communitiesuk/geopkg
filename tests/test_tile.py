@@ -3,9 +3,10 @@ from dataclasses import asdict
 import pytest
 from shapely.geometry import Polygon
 
-from geopkg.tile.compute import calculate_latitude, calculate_longitude
-from geopkg.tile.core import Tile
-from geopkg.types.model import Coordinate, Vector
+from geopkg.constants import UK_BBOX
+from geopkg.tile import Tile, generate_tiles
+from geopkg.tile.compute import calculate_latitude, calculate_longitude, tiles_at_zoom
+from geopkg.types.model import BoundingBox, Coordinate, Vector
 
 
 @pytest.mark.parametrize(
@@ -111,3 +112,44 @@ def test_children(c: Coordinate, expected: list[str]) -> None:
 
 def test_global_tile() -> None:
     assert Tile(Coordinate(0, 0, 0)).parent.id == "0-0-0"
+
+
+def test_tile_repr() -> None:
+    assert repr(Tile(Coordinate(0, 0, 0))) == "0-0-0"
+
+
+def test_tile_eq() -> None:
+    assert Tile(Coordinate(0, 0, 0)) == Tile(Coordinate(0, 0, 0))
+
+
+def test_tiles_at_zoom() -> None:
+    for z in range(1, 11):
+        t = generate_tiles(
+            BoundingBox(
+                north=90.0,
+                south=-90.0,
+                east=180.0,
+                west=-180.0,
+            ),
+            max_z=z,
+        )
+
+        assert len(t) == tiles_at_zoom(z)
+
+
+@pytest.mark.parametrize(
+    "z, length",
+    [
+        (1, 3),
+        (2, 5),
+        (3, 7),
+        (4, 11),
+        (5, 15),
+        (6, 27),
+        (7, 59),
+        (8, 179),
+    ],
+)
+def test_generate_tiles(z: int, length: int) -> None:
+    t = generate_tiles(UK_BBOX, max_z=z)
+    assert len(t) == length

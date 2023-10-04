@@ -45,9 +45,7 @@ class Tile:
         return [Tile(Coordinate(*c)) for c in mercantile.children(mt)]
 
     def geometry(self) -> Polygon:
-        w, s, e, n = self.bbox.edges
-        coords = [(e, s), (e, n), (w, n), (w, s)]
-        return Polygon(coords, holes=None)
+        return Polygon(self.bbox.vertices, holes=None)
 
     def __repr__(self) -> str:
         return self.id

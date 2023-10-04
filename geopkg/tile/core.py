@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Any, Generator
 
 import mercantile
@@ -45,8 +45,8 @@ class Tile:
         return [Tile(Coordinate(*c)) for c in mercantile.children(mt)]
 
     def geometry(self) -> Polygon:
-        minx, miny, maxx, maxy = asdict(self.bbox).values()
-        coords = [(maxx, miny), (maxx, maxy), (minx, maxy), (minx, miny)]
+        w, s, e, n = self.bbox.edges
+        coords = [(e, s), (e, n), (w, n), (w, s)]
         return Polygon(coords, holes=None)
 
     def __repr__(self) -> str:

@@ -5,6 +5,7 @@ import geopandas as gpd  # type: ignore
 import pandas as pd
 
 from geopkg import UK_BBOX
+from geopkg.constants import DEFAULT_MAX_ZOOM
 from geopkg.tile import generate_tiles
 from geopkg.validators import validate_geocode_gdf
 
@@ -60,8 +61,10 @@ class GeoTiler:
     def geocodes(self) -> list[str]:
         return list(set(self.geocode_gdf["code"]))
 
-    def map_code_to_tile(self) -> dict[str, Union[str, list[str]]]:
-        tiles = generate_tiles(UK_BBOX, 13)
+    def map_code_to_tile(
+        self, max_zoom: int = DEFAULT_MAX_ZOOM
+    ) -> dict[str, Union[str, list[str]]]:
+        tiles = generate_tiles(UK_BBOX, max_zoom)
         tiles_gdf = gpd.GeoDataFrame(  # type: ignore
             data=[tile.id for tile in tiles],
             geometry=[tile.geometry() for tile in tiles],
@@ -69,19 +72,17 @@ class GeoTiler:
             crs=4326,
         )
 
-        tiles_gdf["zoom"] = tiles_gdf["tile_id"].str.split(  # type: ignore
-            "-", expand=True
-        )[2]
-        zooms: list[int] = list(set(tiles_gdf["zoom"]))  # type: ignore
-
         intersect = pd.DataFrame(
             self.geocode_gdf.sjoin(tiles_gdf, predicate="intersects")  # type: ignore
-            .groupby(["code", "name", "welsh_name", "tile_id", "zoom"])
+            .groupby(["code", "tile_id"])
             .size()
-            .reset_index(name="count")[
-                ["code", "name", "welsh_name", "tile_id", "zoom"]
-            ]
+            .reset_index(name="count")[["code", "tile_id"]]
         )
+
+        intersect["zoom"] = intersect["tile_id"].str.split(  # type: ignore
+            "-", expand=True
+        )[2]
+        zooms: list[int] = list(set(intersect["zoom"]))
 
         ret_map: dict[str, Union[str, list[str]]] = {}
         for code in self.geocodes:
@@ -120,6 +121,6 @@ def create_tile_map(
         code_field=code_field,
         name_field=name_field,
         welsh_name_field=welsh_name_field,
-    ).map_code_to_tile()
+    )
 
-    return geotiler
+    return geotiler.map_code_to_tile()

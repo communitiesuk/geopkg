@@ -1,3 +1,4 @@
+import warnings
 from dataclasses import dataclass
 from typing import Optional, Union
 
@@ -64,6 +65,12 @@ class GeoTiler:
     def map_code_to_tile(
         self, max_zoom: int = DEFAULT_MAX_ZOOM
     ) -> dict[str, Union[str, list[str]]]:
+        if max_zoom > 10:
+            warnings.warn(
+                "WARNING: zoom levels above 10 can take a significant amount \
+                    of time to complete",
+            )
+
         tiles = generate_tiles(UK_BBOX, max_zoom)
         tiles_gdf = gpd.GeoDataFrame(  # type: ignore
             data=[tile.id for tile in tiles],
@@ -101,7 +108,9 @@ class GeoTiler:
                 ].values[0],
                 "welsh_name": self.geocode_gdf.loc[
                     self.geocode_gdf["code"] == code, "welsh_name"
-                ].values[0],
+                ].values[0]
+                if self.welsh_name_field is not None
+                else "",
                 "tiles": tile_data,
             }
 
@@ -110,6 +119,7 @@ class GeoTiler:
 
 def create_tile_map(
     geocode_gdf: gpd.GeoDataFrame,
+    max_zoom: int,
     year: int,
     code_field: str,
     name_field: str,
@@ -123,4 +133,4 @@ def create_tile_map(
         welsh_name_field=welsh_name_field,
     )
 
-    return geotiler.map_code_to_tile()
+    return geotiler.map_code_to_tile(max_zoom)

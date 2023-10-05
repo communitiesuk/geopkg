@@ -54,7 +54,7 @@ class Tile:
             "id": self.id,
             "geometry": self.geometry().__geo_interface__,
             "properties": {
-                "title": f"XYz tile {self.id}",
+                "title": f"XYZ tile {self.id}",
             },
         }
 

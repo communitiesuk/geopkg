@@ -47,6 +47,17 @@ class Tile:
     def geometry(self) -> Polygon:
         return Polygon(self.bbox.vertices, holes=None)
 
+    def geojson(self) -> dict[str, Any]:
+        return {
+            "type": "Feature",
+            "bbox": self.bbox.edges,
+            "id": self.id,
+            "geometry": self.geometry().__geo_interface__,
+            "properties": {
+                "title": f"XYz tile {self.id}",
+            },
+        }
+
     def __repr__(self) -> str:
         return self.id
 

@@ -19,6 +19,7 @@ disable=missing-function-docstring,
         W0613,
         W0703,
         W2301,
+        W0235,
 [FORMAT]
 max-line-length=88
 good-names=i,j,x,y,id

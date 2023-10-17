@@ -23,8 +23,8 @@ class Grid:
 
     def generate(self, *geotypes: str) -> dict[str, list[GridTile]]:
         for g in geotypes:
-            if GeoType[g.upper()] not in GEO_TYPE_ZOOM_MAP:
-                raise ValueError(f"Unknown geotype: {g}")
+            if g.upper() not in GeoType.__members__:
+                raise KeyError(f"Unknown geotype: {g}")
 
         if len(geotypes) == 1:
             return {geotypes[0].upper(): [UK_VIEW]}

@@ -26,6 +26,8 @@ class Grid:
             if g.upper() not in GeoType.__members__:
                 raise KeyError(f"Unknown geotype: {g}")
 
+        geotypes = tuple(g.value for g in GeoType if g.value in geotypes)
+
         if len(geotypes) == 1:
             return {geotypes[0].upper(): [UK_VIEW]}
 

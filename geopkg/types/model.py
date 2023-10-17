@@ -27,3 +27,8 @@ class BoundingBox:
     @property
     def edges(self) -> tuple[float, float, float, float]:
         return self.west, self.south, self.east, self.north
+
+    @property
+    def vertices(self) -> list[tuple[float, float]]:
+        w, s, e, n = self.edges
+        return [(e, s), (e, n), (w, n), (w, s)]
